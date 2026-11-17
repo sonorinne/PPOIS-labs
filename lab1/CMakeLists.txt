@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 project(PPOISLab1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+option(STATIC_RELEASE "Build standalone Linux executables" OFF)
+if(STATIC_RELEASE AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_link_options(-static)
+endif()
 
 option(ENABLE_COVERAGE "Collect coverage with GCC" OFF)
 if(ENABLE_COVERAGE)
@@ -45,9 +51,13 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
-find_package(Doxygen QUIET)
-if(Doxygen_FOUND)
-  set(DOXYGEN_EXTRACT_ALL YES)
-  set(DOXYGEN_GENERATE_LATEX NO)
-  doxygen_add_docs(docs dictionary turing cli)
+find_program(DOXYGEN_EXECUTABLE doxygen)
+if(DOXYGEN_EXECUTABLE)
+  file(RELATIVE_PATH DOCS_SOURCE "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  configure_file(Doxyfile.in Doxyfile @ONLY)
+  add_custom_target(docs
+    COMMAND "${DOXYGEN_EXECUTABLE}" Doxyfile
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    VERBATIM
+  )
 endif()

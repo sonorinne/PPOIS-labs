@@ -20,6 +20,8 @@ class Dictionary {
   Dictionary& operator+=(const Entry& entry);
   /// Insert a pair of null-terminated strings.
   Dictionary& operator+=(const std::pair<const char*, const char*>& entry);
+  /// Insert a pair of mutable null-terminated strings.
+  Dictionary& operator+=(const std::pair<char*, char*>& entry);
   /// Remove a word if it exists.
   Dictionary& operator-=(const std::string& word);
   /// Find a translation, throwing std::out_of_range for an unknown word.

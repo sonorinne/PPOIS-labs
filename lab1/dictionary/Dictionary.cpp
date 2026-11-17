@@ -47,6 +47,10 @@ Dictionary& Dictionary::operator+=(
   return *this += Entry{entry.first, entry.second};
 }
 
+Dictionary& Dictionary::operator+=(const std::pair<char*, char*>& entry) {
+  return *this += Entry{entry.first, entry.second};
+}
+
 Dictionary& Dictionary::operator-=(const std::string& word) {
   if (Remove(root_, word)) --size_;
   return *this;
