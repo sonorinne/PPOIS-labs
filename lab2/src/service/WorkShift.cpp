@@ -3,6 +3,11 @@
 #include "InvalidQuantity.h"
 #include "InvalidOrder.h"
 
+namespace {
+constexpr int kMinutesPerHour = 60;
+}
+
+
 void WorkShift::Finish(int minute) {
   if (end_ != 0 || minute <= start_) throw InvalidQuantity();
   end_ = minute;
@@ -15,5 +20,5 @@ int WorkShift::Duration() const {
 }
 
 int WorkShift::Salary() const {
-  return Duration() * rate_ / 60;
+  return Duration() * rate_ / kMinutesPerHour;
 }

@@ -1,11 +1,16 @@
 #include "PizzaSize.h"
 
+namespace {
+constexpr int kPercentBase = 100;
+}
+
+
 #include "InvalidAmount.h"
 #include "InvalidQuantity.h"
 
 int PizzaSize::ScalePrice(int base) const {
   if (base < 0) throw InvalidAmount();
-  return base * price_percent_ / 100;
+  return base * price_percent_ / kPercentBase;
 }
 
 bool PizzaSize::Fits(int oven_diameter) const {

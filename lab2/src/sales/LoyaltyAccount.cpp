@@ -4,9 +4,14 @@
 #include "InvalidAmount.h"
 #include "InsufficientPayment.h"
 
+namespace {
+constexpr int kCentsPerPoint = 100;
+}
+
+
 void LoyaltyAccount::Earn(const Payment& payment) {
   if (!payment.GetCaptured()) throw InsufficientPayment();
-  int bonus = payment.GetAmount() / 100;
+  int bonus = payment.GetAmount() / kCentsPerPoint;
   points_ += bonus;
   earned_ += bonus;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "InvalidQuantity.h"
 #include <vector>
 
 
@@ -9,7 +10,9 @@ class PizzaSize {
  public:
   PizzaSize() = default;
   PizzaSize(const std::string& name, int diameter, int slices, int percent)
-      : name_(name), diameter_(diameter), slices_(slices), price_percent_(percent) {}
+      : name_(name), diameter_(diameter), slices_(slices), price_percent_(percent) {
+    if (diameter <= 0 || slices <= 0 || percent <= 0) throw InvalidQuantity();
+  }
   int ScalePrice(int base) const;
   bool Fits(int oven_diameter) const;
   int SliceWeight(int grams) const;

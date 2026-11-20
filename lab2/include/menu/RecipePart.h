@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "InvalidQuantity.h"
 #include <vector>
 #include "Ingredient.h"
 class StockRoom;
@@ -8,7 +9,9 @@ class StockRoom;
 class RecipePart {
  public:
   RecipePart() = default;
-  RecipePart(const Ingredient& ingredient, int grams) : ingredient_(ingredient), grams_(grams) {}
+  RecipePart(const Ingredient& ingredient, int grams) : ingredient_(ingredient), grams_(grams) {
+    if (grams <= 0) throw InvalidQuantity();
+  }
   int Required(int count) const;
   int Cost(int count) const;
   void TakeFrom(StockRoom& stock, int count) const;

@@ -3,9 +3,14 @@
 #include "StockRoom.h"
 #include "InvalidQuantity.h"
 
+namespace {
+constexpr int kPercentBase = 100;
+}
+
+
 int RecipePart::Required(int count) const {
   if (count <= 0) throw InvalidQuantity();
-  return grams_ * count * (100 + loss_percent_) / 100;
+  return grams_ * count * (kPercentBase + loss_percent_) / kPercentBase;
 }
 
 int RecipePart::Cost(int count) const {

@@ -3,8 +3,14 @@
 #include "InvalidQuantity.h"
 #include "InvalidOrder.h"
 
+namespace {
+constexpr int kMinimumStars = 1;
+constexpr int kMaximumStars = 5;
+}
+
+
 void Review::Rate(int stars) {
-  if (published_ || stars < 1 || stars > 5) throw InvalidQuantity();
+  if (published_ || stars < kMinimumStars || stars > kMaximumStars) throw InvalidQuantity();
   stars_ = stars;
 }
 

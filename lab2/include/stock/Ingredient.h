@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "InvalidAmount.h"
 #include <vector>
 
 
@@ -9,7 +10,9 @@ class Ingredient {
  public:
   Ingredient() = default;
   Ingredient(const std::string& name, int calories, int price, bool allergen)
-      : name_(name), calories_(calories), price_(price), allergen_(allergen) {}
+      : name_(name), calories_(calories), price_(price), allergen_(allergen) {
+    if (name.empty() || calories < 0 || price < 0) throw InvalidAmount();
+  }
   int Cost(int grams) const;
   int Energy(int grams) const;
   bool Allowed(bool avoid_allergens) const;

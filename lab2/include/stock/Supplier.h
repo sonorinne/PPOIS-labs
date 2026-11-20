@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "InvalidAmount.h"
 #include <vector>
 
 class Ingredient;
@@ -8,7 +9,9 @@ class Ingredient;
 class Supplier {
  public:
   Supplier() = default;
-  Supplier(const std::string& name, int minimum, int shipping) : name_(name), minimum_(minimum), shipping_(shipping) {}
+  Supplier(const std::string& name, int minimum, int shipping) : name_(name), minimum_(minimum), shipping_(shipping) {
+    if (name.empty() || minimum < 0 || shipping < 0) throw InvalidAmount();
+  }
   int Quote(const Ingredient& ingredient, int grams) const;
   void Suspend();
   void Resume();

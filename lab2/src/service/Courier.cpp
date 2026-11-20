@@ -2,6 +2,12 @@
 #include "Address.h"
 #include "UnavailableCourier.h"
 
+namespace {
+constexpr int kMinutesPerKilometer = 5;
+constexpr int kHandoverMinutes = 10;
+}
+
+
 void Courier::Assign(const Address& address) {
   if (busy_) throw UnavailableCourier();
   address.Validate();
@@ -18,5 +24,5 @@ void Courier::Complete(const Address& address) {
 
 int Courier::Estimate(const Address& address) const {
   address.Validate();
-  return address.GetDistance() * 5 + 10;
+  return address.GetDistance() * kMinutesPerKilometer + kHandoverMinutes;
 }
