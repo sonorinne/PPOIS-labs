@@ -2,6 +2,66 @@
 
 Варианты 1.2 «Англо-русский словарь» и 1.8.2 «Машина Тьюринга». Для сборки нужны компилятор C++17 и CMake 3.24 или новее. При первой сборке тестов CMake скачивает doctest 2.4.11.
 
+## Где что находится
+
+| Файл или папка | Назначение |
+| --- | --- |
+| `dictionary/Dictionary.h`, `dictionary/Dictionary.cpp` | Словарь, узлы дерева, поиск, вставка, удаление и копирование |
+| `turing/Tape.h`, `turing/Tape.cpp` | Чтение и изменение клеток ленты |
+| `turing/Program.h`, `turing/Program.cpp` | Правила переходов и таблица правил |
+| `turing/TuringMachine.h`, `turing/TuringMachine.cpp` | Состояние, головка и выполнение программы |
+| `cli/dictionary_main.cpp`, `cli/turing_main.cpp` | Точки входа двух программ |
+| `cli/DictionaryMenu.cpp`, `cli/TuringMenu.cpp` | Чтение команд и вывод результатов |
+| `tests/` | Юнит-тесты словаря, машины и меню |
+| `examples/` | Исходные данные для демонстрации |
+| `CMakeLists.txt` | Настройка сборки, тестов и документации |
+| `Doxyfile.in` | Шаблон настроек Doxygen |
+| `../.github/workflows/lab1.yml` | Автоматические проверки, сборка архивов и публикация релиза |
+
+## Готовая версия для Windows
+
+Открой [Releases](https://github.com/sonorinne/PPOIS-labs/releases), скачай `lab1-windows-x64.zip` и распакуй его. Открой Git Bash или PowerShell в папке, где рядом находятся `dictionary.exe`, `turing.exe` и `examples`.
+
+Запуск словаря из терминала:
+
+```sh
+./dictionary.exe
+```
+
+После появления меню введи команды словаря:
+
+```text
+load examples/dictionary.txt
+find apple
+add sky небо
+replace sky "голубое небо"
+find sky
+size
+list
+remove sky
+find sky
+save saved_dictionary.txt
+exit
+```
+
+Ожидаемые результаты: перевод `apple` — `яблоко`, новый перевод `sky` — `голубое небо`, размер до удаления — 4. Поиск удалённого `sky` сообщает `Unknown word: sky`. После `exit` управление возвращается в терминал.
+
+Запуск машины из того же терминала:
+
+```sh
+./turing.exe examples/unary_increment.txt -log
+```
+
+Ожидаемый итог — четыре единицы в позициях 0–3, состояние `halt`, головка в позиции 3. Пример дописывает единицу к унарному числу `111` и получает `1111`.
+
+## Порядок показа на сдаче
+
+1. Показать релиз и запустить распакованные программы командами из предыдущего раздела.
+2. Собрать исходники и запустить тесты командами ниже.
+3. Сгенерировать и открыть документацию.
+4. Открыть [Actions](https://github.com/sonorinne/PPOIS-labs/actions) и показать успешные проверки, отчёт покрытия и артефакты.
+5. Открыть нужные классы по карте файлов выше и объяснить код.
+
 ## Сборка и тесты
 
 Выполнять из корня репозитория. Команды одинаковые для PowerShell и Git Bash.
@@ -14,6 +74,54 @@ cmake --install build-lab1 --config Release --prefix build-lab1/package
 ```
 
 Исполняемые файлы и примеры появятся в `build-lab1/package`. При установке Doxygen до вызова CMake доступна команда `cmake --build build-lab1 --target docs`. Она создаёт `build-lab1/html/index.html`.
+
+Если на текущем ноутбуке CMake не находится в Git Bash, сначала выполни:
+
+```sh
+export PATH="/c/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH"
+```
+
+Команда прямого запуска юнит-тестов для сборки Visual Studio из корня репозитория:
+
+```sh
+cd build-lab1/tests
+./Release/lab1_tests.exe
+cd ../..
+```
+
+Переход в `tests` нужен для доступа к копиям файлов примеров, которые используются тестами. Обычный запуск через CTest сам выбирает рабочую папку.
+
+## Генерация и открытие документации
+
+Из корня репозитория, если Doxygen установлен и доступен в терминале:
+
+```sh
+cmake -S lab1 -B build-lab1
+cmake --build build-lab1 --target docs
+explorer.exe build-lab1/html/index.html
+```
+
+На текущем ноутбуке переносимый Doxygen скачан в `build-tools/doxygen`. Для Git Bash настройка выполняется так:
+
+```sh
+cmake -S lab1 -B build-lab1 -DDOXYGEN_EXECUTABLE="$PWD/build-tools/doxygen/doxygen.exe"
+cmake --build build-lab1 --target docs
+explorer.exe build-lab1/html/index.html
+```
+
+В браузере открой список классов и страницу `Dictionary` или `TuringMachine`. Также HTML можно скачать как артефакт `lab1-doxygen` со страницы успешного запуска Actions и открыть распакованный `index.html`.
+
+## Что выполняет Actions
+
+| Задание | Действия |
+| --- | --- |
+| `verify` | Скачивает код, устанавливает инструменты, собирает программы, запускает тесты, проверяет покрытие выше 90%, запускает cppcheck и генерирует Doxygen |
+| `package` | После `verify` собирает программы для Windows и Linux, запускает тесты и проверяет готовые программы, сохраняет архивы в Artifacts |
+| `release` | При отправке тега `lab1-v*` публикует проверенные архивы в Releases |
+
+На странице задания можно раскрыть каждый шаг и прочитать его команды и результат. Отчёт покрытия находится в шаге `Require line coverage above 90 percent`. Архивы и документация находятся внизу страницы запуска в разделе Artifacts.
+
+## Измерение покрытия локально
 
 На Linux покрытие можно измерить с GCC и gcovr.
 
@@ -33,8 +141,8 @@ GitHub Actions запускает тесты, считает покрытие с
 ```sh
 git switch lab1/cpp
 git push origin lab1/cpp
-git tag -a lab1-v1.0.0 -m "Laboratory 1 version 1.0.0"
-git push origin lab1-v1.0.0
+git tag -a lab1-v1.0.1 -m "Laboratory 1 version 1.0.1"
+git push origin lab1-v1.0.1
 ```
 
 На вкладке Actions дождись успешных заданий `verify`, `package` и `release`. В Releases появится версия с именем тега и архивами для Windows и Linux. Проверки pull request также запускаются, а публикация выполняется только при отправке тега.
@@ -76,3 +184,23 @@ exit
 В примере головка проходит три единицы и доходит до пустой клетки с индексом 3. Правило для пустой клетки записывает ещё одну единицу и переводит машину в `halt`. Для `halt` правил нет.
 
 В меню можно загрузить этот же файл командой `load lab1/examples/unary_increment.txt`, посмотреть таблицу командой `rules`, выполнить один переход командой `step`, а оставшиеся с журналом командой `log`. Команды `write`, `add` и `remove` редактируют ленту и таблицу.
+
+Для пошагового показа из корня репозитория открой меню:
+
+```sh
+./build-lab1/package/turing.exe
+```
+
+Затем введи в меню:
+
+```text
+load lab1/examples/unary_increment.txt
+rules
+show
+step
+show
+log
+exit
+```
+
+После одного `step` головка будет в позиции 1, состояние останется `start`. После `log` машина дойдёт до `halt` с головкой в позиции 3.
