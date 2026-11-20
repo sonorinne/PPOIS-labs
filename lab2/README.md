@@ -6,13 +6,14 @@
 
 | Показатель | Реализовано в предметной модели | Минимум |
 | --- | --- | --- |
-| Классы, включая исключения | 50 (38 предметных и 12 исключений) | 50 |
-| Собственные нестатические поля | 153 | 150 |
-| Содержательные поведения | 114 | 100 |
-| Прямые связи между разными классами | 63 | 30 |
+| Предметные классы без исключений | 50 | 50 |
+| Все классы модели с исключениями | 62 | — |
+| Собственные нестатические поля | 190 | 150 |
+| Содержательные поведения | 151 | 100 |
+| Прямые связи между разными классами | 81 | 30 |
 | Собственные исключения | 12 | 12 |
 
-Класс Console относится к интерфейсу и учитывается отдельно. Вместе с ним в проекте 51 класс. Статистика предметной модели проверяется командой `cmake -P lab2/tools/CheckModel.cmake` и тестом `model`. В число поведений не включены конструкторы, геттеры и пять простых переключателей состояния. Связь учитывается один раз для пары классов, если тип встречается в поле или параметре метода. Числовые идентификаторы для связей не используются.
+Класс Console относится к интерфейсу и учитывается отдельно. Вместе с ним в проекте 63 класса. Исключения не включаются в требуемые 50 предметных классов. Статистика предметной модели проверяется командой `cmake -P lab2/tools/CheckModel.cmake` и тестом `model`. В число поведений не включены конструкторы, геттеры и пять простых переключателей состояния. Связь учитывается один раз для пары классов, если тип встречается в поле или параметре метода. Числовые идентификаторы для связей не используются.
 
 У каждого класса свой заголовочный файл. У каждого предметного класса также свой файл реализации. Исключения определены в отдельных заголовках. Поля предметных классов закрыты через private, интерфейс обращается к объектам через методы.
 
@@ -78,6 +79,7 @@ exit
 | add COUNT | Добавление пицц в заказ |
 | total | Расчёт суммы |
 | pay CASH | Оплата и расчёт сдачи |
+| receipt | Печать чека оплаченного заказа |
 | bake | Списание ингредиента и выпечка |
 | pack | Расход коробок и салфеток |
 | deliver | Назначение курьера и завершение доставки |
@@ -132,6 +134,18 @@ exit
 | [Review](include/service/Review.h) · [cpp](src/service/Review.cpp) | Отзыв клиента | `Customer customer_`<br>`int stars_`<br>`std::string text_`<br>`bool published_` | `void Rate(int stars)`<br>`void Write(const std::string& text)`<br>`void Publish()` | Customer |
 | [WorkShift](include/service/WorkShift.h) · [cpp](src/service/WorkShift.cpp) | Учёт смены повара | `Cook cook_`<br>`int start_`<br>`int end_`<br>`int rate_` | `void Finish(int minute)`<br>`int Duration() const`<br>`int Salary() const` | Cook |
 | [Pizzeria](include/service/Pizzeria.h) · [cpp](src/service/Pizzeria.cpp) | Продажа и приготовление в пиццерии | `Menu menu_`<br>`CashRegister cash_`<br>`Kitchen kitchen_`<br>`int served_` | `void OpenMenu(const MenuItem& item)`<br>`Payment Sell(Order& order, int tendered)`<br>`void Bake(const BakingTask& task)` | MenuItem, Menu, Order, CashRegister, BakingTask, Kitchen |
+| [Drink](include/menu/Drink.h) · [cpp](src/menu/Drink.cpp) | Напиток и запас порций | `std::string name_`<br>`int price_`<br>`int milliliters_`<br>`int available_` | `bool CanSell(int count) const`<br>`int Sell(int count)`<br>`void Restock(int count)` | — |
+| [MealDeal](include/menu/MealDeal.h) · [cpp](src/menu/MealDeal.cpp) | Набор из пиццы и напитка | `Pizza pizza_`<br>`Drink drink_`<br>`int discount_` | `int Price() const`<br>`bool CanServe(int count) const`<br>`int Sell(int count)` | Pizza, Drink |
+| [LunchOffer](include/menu/LunchOffer.h) · [cpp](src/menu/LunchOffer.cpp) | Скидка в заданное время | `MenuItem item_`<br>`int start_`<br>`int end_`<br>`int percent_` | `bool IsActive(int minute) const`<br>`int Discount(int count) const`<br>`int Quote(int minute, int count) const` | MenuItem |
+| [WasteRecord](include/stock/WasteRecord.h) · [cpp](src/stock/WasteRecord.cpp) | Акт списания ингредиента | `Ingredient ingredient_`<br>`int grams_`<br>`std::string reason_`<br>`bool booked_` | `int Cost() const`<br>`void Apply(StockRoom& stock)`<br>`std::string Describe() const` | Ingredient, StockRoom |
+| [StockAudit](include/stock/StockAudit.h) · [cpp](src/stock/StockAudit.cpp) | Инвентаризация остатков | `StockRoom snapshot_`<br>`bool captured_` | `void Capture(const StockRoom& stock)`<br>`int TotalGrams() const`<br>`int Difference(const StockRoom& current) const` | StockRoom |
+| [SupplierInvoice](include/stock/SupplierInvoice.h) · [cpp](src/stock/SupplierInvoice.cpp) | Счёт по закрытой закупке | `PurchaseOrder purchase_`<br>`int paid_`<br>`bool settled_` | `void Issue(const PurchaseOrder& purchase)`<br>`int Outstanding() const`<br>`void Settle(int amount)` | PurchaseOrder |
+| [Receipt](include/sales/Receipt.h) · [cpp](src/sales/Receipt.cpp) | Чек для оплаченного заказа | `Order order_`<br>`Payment payment_`<br>`std::string shop_` | `void Validate() const`<br>`int Total() const`<br>`std::string Text() const` | Order, Payment |
+| [RefundRequest](include/sales/RefundRequest.h) · [cpp](src/sales/RefundRequest.cpp) | Запрос на возврат платежа | `Payment& payment_`<br>`std::string reason_`<br>`bool resolved_` | `void Validate() const`<br>`void Resolve(CashRegister& cash)`<br>`int RequestedAmount() const` | Payment, CashRegister |
+| [ExpenseBook](include/sales/ExpenseBook.h) · [cpp](src/sales/ExpenseBook.cpp) | Учёт закупок, зарплаты и списаний | `int purchases_`<br>`int wages_`<br>`int waste_` | `void RecordPurchase(const PurchaseOrder& purchase)`<br>`void RecordShift(const WorkShift& shift)`<br>`void RecordWaste(const WasteRecord& record)`<br>`int Total() const` | PurchaseOrder, WorkShift, WasteRecord |
+| [ThermalBag](include/service/ThermalBag.h) · [cpp](src/service/ThermalBag.cpp) | Термосумка для готовых пицц | `std::vector<Pizza> pizzas_`<br>`int capacity_`<br>`bool clean_` | `void Load(const Pizza& pizza)`<br>`Pizza Unload()`<br>`void Clean()` | Pizza |
+| [DeliveryRoute](include/service/DeliveryRoute.h) · [cpp](src/service/DeliveryRoute.cpp) | План выездов по адресам | `std::vector<Address> stops_`<br>`int capacity_`<br>`bool finished_` | `void AddStop(const Address& address)`<br>`int TotalDistance() const`<br>`void Finish()` | Address |
+| [SalesReport](include/sales/SalesReport.h) · [cpp](src/sales/SalesReport.cpp) | Сводка оплаченных продаж | `std::vector<Order> orders_`<br>`std::vector<Payment> payments_` | `void Record(const Order& order, const Payment& payment)`<br>`int Revenue() const`<br>`int AverageCheck() const` | Order, Payment |
 | [Console](cli/Console.h) · [cpp](cli/Console.cpp) | Консольный интерфейс | shop_, order_, payment_, stock_, packaging_, courier_, baked_, packed_ | Run, Execute, Stock, Pay, Bake, Pack, Deliver, Reset | Pizzeria, Order, Payment, StockRoom, Packaging, Courier |
 
 ## Исключения
@@ -181,6 +195,6 @@ explorer.exe build-lab2/html/index.html
 ```sh
 git switch lab2/pizzeria
 git push origin lab2/pizzeria
-git tag -a lab2-v1.0.0 -m "Pizzeria version 1.0.0"
-git push origin lab2-v1.0.0
+git tag -a lab2-v1.0.2 -m "Pizzeria version 1.0.2"
+git push origin lab2-v1.0.2
 ```
