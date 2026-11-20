@@ -4,8 +4,7 @@ on:
   pull_request:
     paths: ['lab1/**', '.github/workflows/lab1.yml']
   push:
-    branches: [main]
-    paths: ['lab1/**', '.github/workflows/lab1.yml']
+    tags: ['lab1-v*']
   workflow_dispatch:
 
 permissions:
@@ -86,7 +85,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/lab1-v')
     needs: package
     runs-on: ubuntu-24.04
     permissions:
@@ -101,9 +100,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: lab1-${{ github.run_number }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: >
           gh release create "$RELEASE_TAG"
           release/lab1-linux-x64.tar.gz release/lab1-windows-x64.zip
-          --target "$GITHUB_SHA" --title "Laboratory 1 · $RELEASE_TAG"
+          --verify-tag --title "Laboratory 1 · $RELEASE_TAG"
           --notes "C++ dictionary and Turing machine, built and checked on Windows and Linux."
