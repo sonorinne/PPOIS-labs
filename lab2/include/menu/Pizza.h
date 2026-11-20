@@ -23,5 +23,5 @@ class Pizza {
   Recipe recipe_;
   PizzaSize size_;
   std::vector<Topping> toppings_;
-  int base_price_ = 600;
+  int base_price_ = 2999;
 };

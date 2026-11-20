@@ -1,5 +1,6 @@
 #include "Console.h"
 #include "Receipt.h"
+#include "Money.h"
 #include "PurchaseLine.h"
 #include "Delivery.h"
 #include "DeliveryZone.h"
@@ -11,7 +12,7 @@
 
 namespace {
 void PrintHelp() {
-  std::cout << "menu | add COUNT | total | pay CASH | receipt | bake | pack | deliver\n"
+  std::cout << "menu | add COUNT | total | pay AMOUNT_BYN | receipt | bake | pack | deliver\n"
             << "stock | restock GRAMS | consume GRAMS | review STARS TEXT | new | exit\n";
 }
 
@@ -51,11 +52,11 @@ void Console::Run() {
 }
 
 void Console::Execute(const std::string& command, std::istringstream& args) {
-  if (command == "menu") std::cout << "Classic 600 cents\n";
+  if (command == "menu") std::cout << "Classic " << Money::FromKopecks(MenuItem{}.Quote(1)).ToString() << '\n';
   else if (command == "add") {
     order_.Add(OrderLine(MenuItem{}, ReadPositive(args)));
-    std::cout << "Total: " << order_.Total() << " cents\n";
-  } else if (command == "total") std::cout << order_.Total() << " cents\n";
+    std::cout << "Total: " << Money::FromKopecks(order_.Total()).ToString() << '\n';
+  } else if (command == "total") std::cout << Money::FromKopecks(order_.Total()).ToString() << '\n';
   else if (command == "pay") Pay(args);
   else if (command == "receipt") std::cout << Receipt(order_, payment_).Text() << '\n';
   else if (command == "bake") Bake();
@@ -86,9 +87,11 @@ void Console::Stock(const std::string& command, std::istringstream& args) {
 }
 
 void Console::Pay(std::istringstream& args) {
-  int cash = ReadPositive(args);
+  std::string text;
+  if (!(args >> text)) throw std::runtime_error("Expected payment in BYN");
+  int cash = Money::Parse(text).ToKopecks();
   payment_ = shop_.Sell(order_, cash);
-  std::cout << "Paid, change: " << payment_.GetChange() << '\n';
+  std::cout << "Paid, change: " << Money::FromKopecks(payment_.GetChange()).ToString() << '\n';
 }
 
 void Console::Bake() {

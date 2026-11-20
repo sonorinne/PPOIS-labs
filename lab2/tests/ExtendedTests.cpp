@@ -80,10 +80,10 @@ TEST_CASE("Drink operations") {
 
 TEST_CASE("MealDeal operations") {
   MealDeal item;
-  CHECK(item.Price()==700);
+  CHECK(item.Price()==3099);
   CHECK(item.CanServe(1));
   CHECK_THROWS_AS(item.Sell(11),UnavailableItem);
-  CHECK(item.Sell(2)==1400);
+  CHECK(item.Sell(2)==6198);
   CHECK_FALSE(item.CanServe(9));
 }
 
@@ -95,8 +95,8 @@ TEST_CASE("LunchOffer operations") {
   CHECK(item.IsActive(720));
   CHECK_FALSE(item.IsActive(719));
   CHECK_FALSE(item.IsActive(900));
-  CHECK(item.Discount(2)==180);
-  CHECK(item.Quote(800,1)==510);
+  CHECK(item.Discount(2)==899);
+  CHECK(item.Quote(800,1)==2550);
   CHECK_THROWS_AS(item.Quote(0,1),UnavailableItem);
 }
 
@@ -161,13 +161,13 @@ TEST_CASE("Receipt operations") {
   Order order;
   order.Add(OrderLine{});
   Payment payment;
-  payment.Capture(order,600);
+  payment.Capture(order,2999);
   Receipt item(order,payment);
   Receipt empty;
   CHECK_THROWS_AS(empty.Total(),InvalidOrder);
   CHECK(item.GetShop()=="Pizzeria");
-  CHECK(item.Total()==600);
-  CHECK(item.Text()=="Pizzeria, total: 600");
+  CHECK(item.Total()==2999);
+  CHECK(item.Text()=="Pizzeria, total: 29.99 BYN");
   Order changed=order;
   changed.Add(OrderLine{});
   Receipt mismatch(changed,payment);
@@ -178,11 +178,11 @@ TEST_CASE("RefundRequest operations") {
   Order order;
   order.Add(OrderLine{});
   Payment payment;
-  payment.Capture(order,600);
+  payment.Capture(order,2999);
   RefundRequest item(payment,"cancelled");
   CHECK(item.GetReason()=="cancelled");
   CHECK_FALSE(item.GetResolved());
-  CHECK(item.RequestedAmount()==600);
+  CHECK(item.RequestedAmount()==2999);
   CashRegister cash;
   cash.Accept(payment);
   item.Resolve(cash);
@@ -229,7 +229,7 @@ TEST_CASE("ThermalBag operations") {
   item.Load(Pizza{});
   item.Load(Pizza{});
   CHECK_THROWS_AS(item.Load(Pizza{}),UnavailableItem);
-  CHECK(item.Unload().Price()==600);
+  CHECK(item.Unload().Price()==2999);
   item.Unload();
   item.Unload();
   CHECK_FALSE(item.GetClean());
@@ -257,7 +257,7 @@ TEST_CASE("SalesReport operations") {
   Order order;
   order.Add(OrderLine{});
   Payment payment;
-  payment.Capture(order,600);
+  payment.Capture(order,2999);
   SalesReport item;
   CHECK(item.GetOrders().empty());
   CHECK(item.GetPayments().empty());
@@ -265,6 +265,6 @@ TEST_CASE("SalesReport operations") {
   Payment empty;
   CHECK_THROWS_AS(item.Record(order,empty),InvalidOrder);
   item.Record(order,payment);
-  CHECK(item.Revenue()==600);
-  CHECK(item.AverageCheck()==600);
+  CHECK(item.Revenue()==2999);
+  CHECK(item.AverageCheck()==2999);
 }

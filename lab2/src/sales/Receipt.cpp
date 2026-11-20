@@ -1,4 +1,5 @@
 #include "Receipt.h"
+#include "Money.h"
 #include "Order.h"
 #include "Payment.h"
 #include "InvalidAmount.h"
@@ -15,5 +16,5 @@ int Receipt::Total() const {
 }
 
 std::string Receipt::Text() const {
-  return shop_ + ", total: " + std::to_string(Total());
+  return shop_ + ", total: " + Money::FromKopecks(Total()).ToString();
 }

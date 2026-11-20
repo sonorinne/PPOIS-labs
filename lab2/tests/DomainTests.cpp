@@ -258,17 +258,17 @@ TEST_CASE("Topping domain operations") {
 TEST_CASE("Pizza domain operations") {
   Pizza item;
   CHECK(item.GetToppings().empty());
-  CHECK(item.GetBasePrice() == 600);
-  CHECK(item.Price()==600);
+  CHECK(item.GetBasePrice() == 2999);
+  CHECK(item.Price()==2999);
   item.AddTopping(Topping{});
-  CHECK(item.Price()==689);
-  CHECK(item.Margin()==668);
-  Pizza empty(Recipe{}, PizzaSize{}, 600);
+  CHECK(item.Price()==3088);
+  CHECK(item.Margin()==3067);
+  Pizza empty(Recipe{}, PizzaSize{}, 2999);
   CHECK_THROWS_AS(empty.Margin(),EmptyRecipe);
   Recipe recipe;
   recipe.Add(RecipePart{});
-  Pizza complete(recipe,PizzaSize{},600);
-  CHECK(complete.Margin()==579);
+  Pizza complete(recipe,PizzaSize{},2999);
+  CHECK(complete.Margin()==2978);
 }
 
 TEST_CASE("MenuItem domain operations") {
@@ -276,7 +276,7 @@ TEST_CASE("MenuItem domain operations") {
   CHECK(item.GetName() == "Classic");
   CHECK(item.GetAvailable() == true);
   CHECK(item.GetSold() == 0);
-  CHECK(item.Quote(2)==1200);
+  CHECK(item.Quote(2)==5998);
   CHECK_THROWS_AS(item.Quote(0),InvalidQuantity);
   item.Sell(2);
   CHECK(item.GetSold()==2);
@@ -294,7 +294,7 @@ TEST_CASE("Menu domain operations") {
   CHECK(item.GetTitle() == "Pizzeria");
   CHECK_THROWS_AS(item.Find("absent"),UnavailableItem);
   item.Add(MenuItem{});
-  CHECK(item.Find("Classic").Quote(1)==600);
+  CHECK(item.Find("Classic").Quote(1)==2999);
   item.Close();
   CHECK_THROWS_AS(item.Add(MenuItem{}),UnavailableItem);
 
@@ -340,16 +340,16 @@ TEST_CASE("LoyaltyAccount domain operations") {
   CHECK_THROWS_AS(item.Earn(payment),InsufficientPayment);
   Order order;
   order.Add(OrderLine{});
-  payment.Capture(order,600);
+  payment.Capture(order,2999);
   item.Earn(payment);
-  CHECK(item.GetPoints()==6);
+  CHECK(item.GetPoints()==29);
   CHECK_THROWS_AS(item.Redeem(0),InvalidAmount);
-  CHECK_THROWS_AS(item.Redeem(7),InsufficientPayment);
+  CHECK_THROWS_AS(item.Redeem(30),InsufficientPayment);
   CHECK_THROWS_AS(item.TransferTo(item,1),InvalidAmount);
   LoyaltyAccount target;
   item.TransferTo(target,2);
   CHECK(target.GetPoints()==2);
-  CHECK(item.Redeem(4)==4);
+  CHECK(item.Redeem(27)==27);
 
 }
 
@@ -364,9 +364,9 @@ TEST_CASE("Coupon domain operations") {
   order.Add(OrderLine{});
   Customer customer;
   CHECK(item.Eligible(customer));
-  CHECK(item.Discount(order)==60);
+  CHECK(item.Discount(order)==299);
   item.Redeem(order);
-  CHECK(order.Total()==540);
+  CHECK(order.Total()==2700);
   CHECK_FALSE(item.Eligible(customer));
   CHECK_THROWS_AS(item.Discount(order),InvalidOrder);
 
@@ -377,15 +377,15 @@ TEST_CASE("OrderLine domain operations") {
   CHECK(item.GetQuantity() == 1);
   CHECK(item.GetComment() == "");
   CHECK(item.GetPacked() == false);
-  CHECK(item.Total()==600);
+  CHECK(item.Total()==2999);
   CHECK_THROWS_AS(item.Increase(0),InvalidQuantity);
   item.Increase(1);
-  CHECK(item.Total()==1200);
+  CHECK(item.Total()==5998);
   item.Pack(PizzaBox{});
   CHECK_THROWS_AS(item.Pack(PizzaBox{}),InvalidOrder);
   CHECK_THROWS_AS(item.Increase(1),InvalidQuantity);
   OrderLine pair(MenuItem{},2);
-  CHECK(pair.Total()==1200);
+  CHECK(pair.Total()==5998);
 }
 
 TEST_CASE("Order domain operations") {
@@ -397,9 +397,9 @@ TEST_CASE("Order domain operations") {
   CHECK_THROWS_AS(item.Confirm(),InvalidOrder);
   CHECK_THROWS_AS(item.ApplyDiscount(-1),InvalidOrder);
   item.Add(OrderLine{});
-  CHECK(item.Subtotal()==600);
+  CHECK(item.Subtotal()==2999);
   item.ApplyDiscount(50);
-  CHECK(item.Total()==550);
+  CHECK(item.Total()==2949);
   item.Confirm();
   CHECK_THROWS_AS(item.Confirm(),InvalidOrder);
   CHECK_THROWS_AS(item.Add(OrderLine{}),InvalidOrder);
@@ -420,11 +420,11 @@ TEST_CASE("Payment domain operations") {
   CHECK_THROWS_AS(item.Refund(),InvalidOrder);
   order.Add(OrderLine{});
   CHECK_THROWS_AS(item.Capture(order,0),InsufficientPayment);
-  item.Capture(order,700);
-  CHECK(item.GetChange()==100);
-  CHECK(item.Net()==600);
-  CHECK_THROWS_AS(item.Capture(order,700),InvalidOrder);
-  CHECK(item.Refund()==600);
+  item.Capture(order,3500);
+  CHECK(item.GetChange()==501);
+  CHECK(item.Net()==2999);
+  CHECK_THROWS_AS(item.Capture(order,3500),InvalidOrder);
+  CHECK(item.Refund()==2999);
   CHECK(item.Net()==0);
   CHECK_THROWS_AS(item.Refund(),InvalidOrder);
 
@@ -440,12 +440,12 @@ TEST_CASE("CashRegister domain operations") {
   CHECK_THROWS_AS(item.Accept(payment),InvalidOrder);
   Order order;
   order.Add(OrderLine{});
-  payment.Capture(order,600);
+  payment.Capture(order,2999);
   CHECK_THROWS_AS(item.Refund(payment),InsufficientPayment);
   item.Accept(payment);
   CHECK_THROWS_AS(item.Accept(payment),InvalidOrder);
   item.Refund(payment);
-  CHECK(item.GetRefunds()==600);
+  CHECK(item.GetRefunds()==2999);
   CHECK(item.Close()==0);
   CHECK_THROWS_AS(item.Close(),InvalidOrder);
   CHECK_THROWS_AS(item.Accept(payment),InvalidOrder);
@@ -710,8 +710,8 @@ TEST_CASE("Pizzeria domain operations") {
   CHECK_THROWS_AS(item.Sell(order,100),InvalidOrder);
   item.OpenMenu(MenuItem{});
   order.Add(OrderLine{});
-  Payment payment = item.Sell(order,600);
-  CHECK(payment.Net()==600);
+  Payment payment = item.Sell(order,2999);
+  CHECK(payment.Net()==2999);
   item.Bake(BakingTask{});
   CHECK(item.GetServed()==1);
   CHECK(item.GetKitchen().GetCompleted()==1);

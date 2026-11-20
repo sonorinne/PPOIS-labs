@@ -1,4 +1,5 @@
 menu
+receipt
 bake
 pack
 deliver
@@ -16,9 +17,10 @@ consume 100
 stock
 add 1
 total
-pay 100
-pay 700
-pay 700
+pay 1.00
+pay 35.00
+receipt
+pay 35.00
 bake
 bake
 pack
