@@ -15,8 +15,17 @@ foreach(example IN ITEMS dictionary.txt unary_increment.txt)
 endforeach()
 add_test(NAME unit COMMAND lab1_tests)
 
-add_test(NAME dictionary_cli COMMAND dictionary)
-add_test(NAME turing_menu COMMAND turing)
+add_test(NAME dictionary_cli COMMAND "${CMAKE_COMMAND}"
+  "-DPROGRAM=$<TARGET_FILE:dictionary>" "-DMENU_TITLE=Dictionary menu"
+  -P "${CMAKE_CURRENT_SOURCE_DIR}/RunMenu.cmake")
+add_test(NAME turing_menu COMMAND "${CMAKE_COMMAND}"
+  "-DPROGRAM=$<TARGET_FILE:turing>" "-DMENU_TITLE=Turing machine menu"
+  -P "${CMAKE_CURRENT_SOURCE_DIR}/RunMenu.cmake")
+set_tests_properties(dictionary_cli turing_menu PROPERTIES TIMEOUT 10)
+add_test(NAME dictionary_utf8 COMMAND "${CMAKE_COMMAND}"
+  "-DPROGRAM=$<TARGET_FILE:dictionary>"
+  -P "${CMAKE_CURRENT_SOURCE_DIR}/RunDictionary.cmake")
+set_tests_properties(dictionary_utf8 PROPERTIES TIMEOUT 10)
 add_test(NAME turing_file COMMAND turing "${PROJECT_SOURCE_DIR}/examples/unary_increment.txt")
 add_test(NAME turing_log COMMAND turing "${PROJECT_SOURCE_DIR}/examples/unary_increment.txt" -log)
 set_tests_properties(turing_file PROPERTIES PASS_REGULAR_EXPRESSION "State: halt, head: 3")
