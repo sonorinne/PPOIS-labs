@@ -1,4 +1,5 @@
 #include "Console.h"
+#include "Receipt.h"
 #include "PurchaseLine.h"
 #include "Delivery.h"
 #include "DeliveryZone.h"
@@ -10,7 +11,7 @@
 
 namespace {
 void PrintHelp() {
-  std::cout << "menu | add COUNT | total | pay CASH | bake | pack | deliver\n"
+  std::cout << "menu | add COUNT | total | pay CASH | receipt | bake | pack | deliver\n"
             << "stock | restock GRAMS | consume GRAMS | review STARS TEXT | new | exit\n";
 }
 
@@ -56,6 +57,7 @@ void Console::Execute(const std::string& command, std::istringstream& args) {
     std::cout << "Total: " << order_.Total() << " cents\n";
   } else if (command == "total") std::cout << order_.Total() << " cents\n";
   else if (command == "pay") Pay(args);
+  else if (command == "receipt") std::cout << Receipt(order_, payment_).Text() << '\n';
   else if (command == "bake") Bake();
   else if (command == "pack") Pack();
   else if (command == "deliver") Deliver();

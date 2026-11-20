@@ -37,7 +37,7 @@ if(BUILD_TESTING)
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     SOURCE_SUBDIR single-header-only)
   FetchContent_MakeAvailable(doctest)
-  add_executable(pizzeria_tests tests/DomainTests.cpp)
+  add_executable(pizzeria_tests tests/DomainTests.cpp tests/ExtendedTests.cpp)
   target_include_directories(pizzeria_tests SYSTEM PRIVATE "${doctest_SOURCE_DIR}")
   target_link_libraries(pizzeria_tests PRIVATE pizzeria_domain)
   add_test(NAME domain COMMAND pizzeria_tests)
