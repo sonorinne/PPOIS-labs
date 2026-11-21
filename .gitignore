@@ -1,6 +1,7 @@
 /build*/
 /.vs/
 /.vscode/
-/lab1/build*/
+/lab*/build*/
 *.gcda
 *.gcno
+/lab2/build*/

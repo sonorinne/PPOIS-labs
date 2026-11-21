@@ -1,29 +1,29 @@
 # Пиццерия
 
-Заказы, меню, склад, кухня и доставка. C++17, CMake 3.24+, doctest. Цены в BYN, расчёты в целых копейках. Оплата принимается с точкой или запятой.
+Заказы, меню, склад, кухня и доставка. C++17, CMake 3.24+, Ninja, doctest. Цены в BYN, расчёты в целых копейках. Оплата принимается с точкой или запятой.
 
 Команды выполняются из корня репозитория. При первой настройке скачивается doctest.
 
 ## Сборка
 
 ```sh
-cmake -S lab2 -B build-lab2
-cmake --build build-lab2 --config Release
+cmake -S lab2 -B lab2/build -G Ninja
+cmake --build lab2/build
 ```
 
 ## Тесты
 
 ```sh
-ctest --test-dir build-lab2 -C Release --output-on-failure
+ctest --test-dir lab2/build --output-on-failure
 ```
 
 ## Запуск
 
 ```sh
-./build-lab2/Release/pizzeria.exe
+./lab2/build/pizzeria.exe
 ```
 
-Для Ninja и Linux используется путь `build-lab2/pizzeria` без каталога Release. На Windows расширение `.exe`.
+На Linux расширение .exe отсутствует.
 
 ## Меню
 
@@ -50,8 +50,8 @@ Classic — 29.99 BYN. Сдача с 35.00 — 5.01 BYN. `bake` требует �
 Требуется Doxygen, доступный при настройке CMake.
 
 ```sh
-cmake --build build-lab2 --target docs
-explorer.exe build-lab2/html/index.html
+cmake --build lab2/build --target docs
+explorer.exe lab2/build/html/index.html
 ```
 
 ## Покрытие (Linux)
@@ -59,16 +59,16 @@ explorer.exe build-lab2/html/index.html
 GCC и gcovr.
 
 ```sh
-cmake -S lab2 -B build-lab2-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-lab2-coverage
-ctest --test-dir build-lab2-coverage --output-on-failure
-gcovr --root . --filter 'lab2/(src|include|cli)/' --txt --fail-under-line 90.01 build-lab2-coverage
+cmake -S lab2 -B lab2/build -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build lab2/build
+ctest --test-dir lab2/build --output-on-failure
+gcovr --root . --filter 'lab2/(src|include|cli)/' --txt --fail-under-line 90.01 lab2/build
 ```
 
 ## Релизы
 
 ```sh
-cmake --install build-lab2 --config Release --prefix build-lab2/package
+cmake --install lab2/build --prefix lab2/build/package
 ```
 
 [Releases](https://github.com/sonorinne/PPOIS-labs/releases) · [Actions](https://github.com/sonorinne/PPOIS-labs/actions)
