@@ -1,0 +1,38 @@
+menu
+receipt
+bake
+pack
+deliver
+add
+add -1
+pay
+pay 0
+restock -1
+restock
+consume 10
+stock
+restock 1000
+restock 500
+consume 100
+stock
+add 1
+total
+pay 1.00
+pay 35.00
+receipt
+pay 35.00
+bake
+bake
+pack
+pack
+deliver
+deliver
+review 0 Bad
+review 6 Bad
+review 5
+review 5 Хорошая пицца
+new
+add 0
+unknown
+
+exit
