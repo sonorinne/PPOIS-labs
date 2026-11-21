@@ -1,25 +1,25 @@
 # Словарь и машина Тьюринга
 
-C++17, CMake 3.24+, doctest. Для документации — Doxygen в PATH.
+C++17, CMake 3.24+, Ninja, doctest. Для документации — Doxygen в PATH.
 Команды выполняются из корня репозитория. При первой настройке скачивается doctest.
 
 ## Сборка
 
 ```sh
-cmake -S lab1 -B build-lab1
-cmake --build build-lab1 --config Release
+cmake -S lab1 -B lab1/build -G Ninja
+cmake --build lab1/build
 ```
 
 ## Тесты
 
 ```sh
-ctest --test-dir build-lab1 -C Release --output-on-failure
+ctest --test-dir lab1/build --output-on-failure
 ```
 
 ## Словарь
 
 ```sh
-./build-lab1/Release/dictionary.exe
+./lab1/build/dictionary.exe
 ```
 
 ```text
@@ -31,7 +31,7 @@ find sky
 size
 list
 remove sky
-save build-lab1/dictionary.txt
+save lab1/build/dictionary.txt
 exit
 ```
 
@@ -40,15 +40,13 @@ exit
 
 ## Машина Тьюринга
 
-```sh
-./build-lab1/Release/turing.exe lab1/examples/unary_increment.txt -log
-```
-
-Пример дописывает единицу к `111`. Итог — `1111`, состояние `halt`, головка в позиции 3.
+Запуск меню из корня репозитория:
 
 ```sh
-./build-lab1/Release/turing.exe
+./lab1/build/turing.exe
 ```
+
+После появления > команды вводятся по одной строке:
 
 ```text
 load lab1/examples/unary_increment.txt
@@ -59,6 +57,18 @@ log
 exit
 ```
 
+load загружает пример, rules показывает правила, show — текущее состояние, step выполняет один переход, log выполняет остальные переходы с выводом. Итог примера — 1111, состояние halt, головка в позиции 3. Успешная загрузка возвращает приглашение >.
+
+Для повторного запуска примера снова выполняется load.
+
+Запуск файла без меню:
+
+```sh
+./lab1/build/turing.exe lab1/examples/unary_increment.txt -log
+```
+
+Этот режим выполняет программу и завершается.
+
 Команды `write POSITION SYMBOL`, `add STATE READ NEXT WRITE L/R/S` и `remove STATE READ` изменяют ленту и правила.
 В файле машины записаны состояние и позиция головки, затем лента и таблица правил.
 `_` — пустая клетка. `L`, `R`, `S` — влево, вправо, на месте.
@@ -67,8 +77,8 @@ exit
 ## Документация
 
 ```sh
-cmake --build build-lab1 --target docs
-explorer.exe build-lab1/html/index.html
+cmake --build lab1/build --target docs
+explorer.exe lab1/build/html/index.html
 ```
 
 ## Покрытие (Linux)
@@ -76,10 +86,10 @@ explorer.exe build-lab1/html/index.html
 GCC и gcovr.
 
 ```sh
-cmake -S lab1 -B build-lab1-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-lab1-coverage
-ctest --test-dir build-lab1-coverage --output-on-failure
-gcovr --root . --filter 'lab1/(dictionary|turing|cli)/' --txt --fail-under-line 90.01 build-lab1-coverage
+cmake -S lab1 -B lab1/build -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build lab1/build
+ctest --test-dir lab1/build --output-on-failure
+gcovr --root . --filter 'lab1/(dictionary|turing|cli)/' --txt --fail-under-line 90.01 lab1/build
 ```
 
 ## Файлы
@@ -97,11 +107,11 @@ gcovr --root . --filter 'lab1/(dictionary|turing|cli)/' --txt --fail-under-line 
 ## Готовые программы
 
 ```sh
-cmake --install build-lab1 --config Release --prefix build-lab1/package
+cmake --install lab1/build --prefix lab1/build/package
 ```
 
 В архивах Releases программы запускаются из папки распаковки.
-Для Ninja и Linux каталог `Release` в пути запуска отсутствует. На Linux расширение `.exe` отсутствует.
+На Linux расширение .exe отсутствует.
 
 [Releases](https://github.com/sonorinne/PPOIS-labs/releases) · [Actions](https://github.com/sonorinne/PPOIS-labs/actions)
 
