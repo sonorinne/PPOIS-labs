@@ -1,41 +1,29 @@
-# Лабораторная работа № 1
+# Словарь и машина Тьюринга
 
-Варианты 1.2 «Англо-русский словарь» и 1.8.2 «Машина Тьюринга». Для сборки нужны компилятор C++17 и CMake 3.24 или новее. При первой сборке тестов CMake скачивает doctest 2.4.11.
+C++17, CMake 3.24+, doctest. Для документации — Doxygen в PATH.
+Команды выполняются из корня репозитория. При первой настройке скачивается doctest.
 
-## Структура проекта
-
-| Файл или папка | Назначение |
-| --- | --- |
-| `dictionary/Dictionary.h`, `dictionary/Dictionary.cpp` | Словарь, узлы дерева, поиск, вставка, удаление и копирование |
-| `turing/Tape.h`, `turing/Tape.cpp` | Чтение и изменение клеток ленты |
-| `turing/Program.h`, `turing/Program.cpp` | Правила переходов и таблица правил |
-| `turing/TuringMachine.h`, `turing/TuringMachine.cpp` | Состояние, головка и выполнение программы |
-| `cli/dictionary_main.cpp`, `cli/turing_main.cpp` | Точки входа двух программ |
-| `cli/DictionaryMenu.cpp`, `cli/TuringMenu.cpp` | Чтение команд и вывод результатов |
-| `tests/` | Юнит-тесты словаря, машины и меню |
-| `examples/` | Исходные данные для демонстрации |
-| `CMakeLists.txt` | Настройка сборки, тестов и документации |
-| `Doxyfile.in` | Шаблон настроек Doxygen |
-| `../.github/workflows/lab1.yml` | Автоматические проверки, сборка архивов и публикация релиза |
-
-## Готовая версия для Windows
-
-Архив `lab1-windows-x64.zip` доступен в разделе [Releases](https://github.com/sonorinne/PPOIS-labs/releases). После распаковки команды выполняются в Git Bash или PowerShell из папки с файлами `dictionary.exe`, `turing.exe` и каталогом `examples`.
-
-Словарь использует UTF-8 для файлов и устанавливает кодировку ввода и вывода консоли Windows при запуске. Для версий до `lab1-v1.0.1` перед запуском в PowerShell выполняется `chcp 65001`.
-
-После обновления программы данные из исходного файла загружаются повторно. Записи, сохранённые ранее с другой кодировкой, требуют повторного ввода в UTF-8.
-
-Запуск словаря из терминала выполняется следующей командой.
+## Сборка
 
 ```sh
-./dictionary.exe
+cmake -S lab1 -B build-lab1
+cmake --build build-lab1 --config Release
 ```
 
-Пример команд в интерактивном меню словаря.
+## Тесты
+
+```sh
+ctest --test-dir build-lab1 -C Release --output-on-failure
+```
+
+## Словарь
+
+```sh
+./build-lab1/Release/dictionary.exe
+```
 
 ```text
-load examples/dictionary.txt
+load lab1/examples/dictionary.txt
 find apple
 add sky небо
 replace sky "голубое небо"
@@ -43,162 +31,78 @@ find sky
 size
 list
 remove sky
-find sky
-save saved_dictionary.txt
+save build-lab1/dictionary.txt
 exit
 ```
 
-Ожидаемые результаты: перевод `apple` — `яблоко`, новый перевод `sky` — `голубое небо`, размер до удаления — 4. Поиск удалённого `sky` сообщает `Unknown word: sky`. После `exit` управление возвращается в терминал.
-
-Запуск машины Тьюринга из той же папки.
-
-```sh
-./turing.exe examples/unary_increment.txt -log
-```
-
-Ожидаемый итог — четыре единицы в позициях 0–3, состояние `halt`, головка в позиции 3. Пример дописывает единицу к унарному числу `111` и получает `1111`.
-
-## Сборка и тесты
-
-Команды выполняются из корня репозитория в PowerShell или Git Bash.
-
-```sh
-cmake -S lab1 -B build-lab1 -DCMAKE_BUILD_TYPE=Release
-cmake --build build-lab1 --config Release
-ctest --test-dir build-lab1 -C Release --output-on-failure
-cmake --install build-lab1 --config Release --prefix build-lab1/package
-```
-
-Исполняемые файлы и примеры появятся в `build-lab1/package`. При установке Doxygen до вызова CMake доступна команда `cmake --build build-lab1 --target docs`. Она создаёт `build-lab1/html/index.html`.
-
-Для установки Visual Studio 2022 Community в стандартном каталоге путь к встроенному CMake можно добавить в Git Bash следующей командой.
-
-```sh
-export PATH="/c/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH"
-```
-
-Прямой запуск юнит-тестов для сборки Visual Studio выполняется из каталога `build-lab1/tests`.
-
-```sh
-cd build-lab1/tests
-./Release/lab1_tests.exe
-cd ../..
-```
-
-Переход в `tests` нужен для доступа к копиям файлов примеров, которые используются тестами. Обычный запуск через CTest сам выбирает рабочую папку.
-
-Проверки запуска интерактивных меню передают команду `exit` через входной файл и ограничены по времени. Проверка `dictionary_utf8` проверяет русский перевод из файла и изменение перевода командами меню.
-
-## Генерация и открытие документации
-
-При установленном Doxygen, доступном через `PATH`, генерация и открытие документации на Windows выполняются из корня репозитория.
-
-```sh
-cmake -S lab1 -B build-lab1
-cmake --build build-lab1 --target docs
-explorer.exe build-lab1/html/index.html
-```
-
-При размещении переносимой версии Doxygen в `build-tools/doxygen` путь к исполняемому файлу задаётся явно. Команды для Git Bash приведены ниже. Каталог `build-tools` используется локально и исключён из Git.
-
-```sh
-cmake -S lab1 -B build-lab1 -DDOXYGEN_EXECUTABLE="$PWD/build-tools/doxygen/doxygen.exe"
-cmake --build build-lab1 --target docs
-explorer.exe build-lab1/html/index.html
-```
-
-Сгенерированный `index.html` содержит список классов и описание их методов. HTML-документация также доступна в артефакте `lab1-doxygen` на странице успешного запуска Actions.
-
-## CI/CD
-
-| Задание | Действия |
-| --- | --- |
-| `verify` | Скачивает код, устанавливает инструменты, собирает программы, запускает тесты, проверяет покрытие выше 90%, запускает cppcheck и генерирует Doxygen |
-| `package` | После `verify` собирает программы для Windows и Linux, запускает тесты и проверяет готовые программы, сохраняет архивы в Artifacts |
-| `release` | При отправке тега `lab1-v*` публикует проверенные архивы в Releases |
-
-Команды и результаты каждого шага доступны в журнале задания на вкладке [Actions](https://github.com/sonorinne/PPOIS-labs/actions). Отчёт покрытия находится в шаге `Require line coverage above 90 percent`. Архивы и документация сохраняются в разделе Artifacts на странице запуска.
-
-## Измерение покрытия локально
-
-На Linux покрытие можно измерить с GCC и gcovr.
-
-```sh
-cmake -S lab1 -B build-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-coverage
-ctest --test-dir build-coverage --output-on-failure
-gcovr --root . --filter 'lab1/(dictionary|turing|cli)/' --txt --fail-under-line 90.01 build-coverage
-```
-
-GitHub Actions запускает тесты, считает покрытие строк исходников обеих программ, проверяет код через cppcheck и генерирует Doxygen. После успешных проверок архивы для Windows и Linux сохраняются как артефакты запуска. Отправка тега `lab1-v*` запускает проверки и публикацию проверенных архивов в Releases из отмеченного коммита.
-
-## Выпуск версии
-
-Выпуск версии выполняется из ветки лабораторной после сохранения и отправки изменений. Тег фиксирует текущий коммит. Каждой версии присваивается уникальное имя, например `lab1-v1.0.1`.
-
-```sh
-git switch lab1/cpp
-git push origin lab1/cpp
-git tag -a lab1-v1.0.1 -m "Laboratory 1 version 1.0.1"
-git push origin lab1-v1.0.1
-```
-
-После успешного завершения заданий `verify`, `package` и `release` в Releases публикуется версия с именем тега и архивами для Windows и Linux. Проверки также запускаются для pull request. Публикация выполняется при отправке тега.
-
-## Англо-русский словарь
-
-Запуск на Windows из корня репозитория — `./build-lab1/package/dictionary.exe`. На Linux имя файла без `.exe`. Для русских переводов требуется терминал с UTF-8.
-
-```text
-load lab1/examples/dictionary.txt
-find apple
-add sky небо
-replace sky "голубое небо"
-remove apple
-size
-list
-save my_dictionary.txt
-exit
-```
-
-В файле сначала идёт число строк с записями. Затем на каждой строке слово и перевод. Кавычки позволяют указывать пробелы. Регистр ключей учитывается. Повторное добавление обновляет перевод. Поиск или замена неизвестного слова сообщает об ошибке. При ошибке чтения словарь сохраняет старое содержимое.
-
-Класс `Dictionary` владеет узлами дерева через `std::unique_ptr`. Копирование создаёт отдельные узлы. Сравнение учитывает слова и переводы независимо от порядка добавления. Поиск, вставка и удаление занимают O(h), где h — высота дерева. При последовательной вставке отсортированных ключей высота может достичь числа слов.
-
-При удалении узла с двумя дочерними узлами на его место переносится минимальный узел правого поддерева. Например, после последовательной вставки ключей `m, g, s, q, r` и удаления `m` новым корнем становится `q`, а его бывший правый дочерний узел `r` занимает прежнее место `q` под `s`.
+В файле словаря сначала указано число записей, затем пары слов. Кавычки позволяют использовать пробелы.
+Повторное добавление обновляет перевод. Поиск неизвестного слова сообщает об ошибке.
 
 ## Машина Тьюринга
 
-Меню открывается при запуске `./build-lab1/package/turing.exe` без аргументов. Запуск из файла выполняется следующей командой. На Linux исполняемый файл имеет имя `turing`.
-
 ```sh
-./build-lab1/package/turing.exe lab1/examples/unary_increment.txt -log
+./build-lab1/Release/turing.exe lab1/examples/unary_increment.txt -log
 ```
 
-Формат файла состоит из состояния и позиции головки, числа заполненных клеток и пар `позиция символ`, затем числа правил и самих правил. Правило записывается как `состояние чтение следующее_состояние запись направление`. Позиции целые со знаком, символы однобайтовые без пробелов, имена состояний без пробелов. `_` обозначает пустую клетку. Направления `L`, `R`, `S` означают влево, вправо и остаться на месте.
-
-`Tape` хранит заполненные клетки, `Program` хранит переходы, `TuringMachine` управляет состоянием и головкой. На шаге машина читает символ, ищет правило для пары «состояние и символ», записывает новый символ, перемещает головку и меняет состояние. Машина останавливается, когда для текущей пары нет правила. Программа с циклом может работать без остановки, её можно прервать через Ctrl+C.
-
-В примере головка проходит три единицы и доходит до пустой клетки с индексом 3. Правило для пустой клетки записывает ещё одну единицу и переводит машину в `halt`. Для `halt` правил нет.
-
-В меню можно загрузить этот же файл командой `load lab1/examples/unary_increment.txt`, посмотреть таблицу командой `rules`, выполнить один переход командой `step`, а оставшиеся с журналом командой `log`. Команды `write`, `add` и `remove` редактируют ленту и таблицу.
-
-Запуск интерактивного меню из корня репозитория.
+Пример дописывает единицу к `111`. Итог — `1111`, состояние `halt`, головка в позиции 3.
 
 ```sh
-./build-lab1/package/turing.exe
+./build-lab1/Release/turing.exe
 ```
-
-Пример команд для просмотра правил и пошагового выполнения.
 
 ```text
 load lab1/examples/unary_increment.txt
 rules
 show
 step
-show
 log
 exit
 ```
 
-После одного `step` головка будет в позиции 1, состояние останется `start`. После `log` машина дойдёт до `halt` с головкой в позиции 3.
+Команды `write POSITION SYMBOL`, `add STATE READ NEXT WRITE L/R/S` и `remove STATE READ` изменяют ленту и правила.
+В файле машины записаны состояние и позиция головки, затем лента и таблица правил.
+`_` — пустая клетка. `L`, `R`, `S` — влево, вправо, на месте.
+Выполнение заканчивается, когда подходящего правила нет.
+
+## Документация
+
+```sh
+cmake --build build-lab1 --target docs
+explorer.exe build-lab1/html/index.html
+```
+
+## Покрытие (Linux)
+
+GCC и gcovr.
+
+```sh
+cmake -S lab1 -B build-lab1-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-lab1-coverage
+ctest --test-dir build-lab1-coverage --output-on-failure
+gcovr --root . --filter 'lab1/(dictionary|turing|cli)/' --txt --fail-under-line 90.01 build-lab1-coverage
+```
+
+## Файлы
+
+| Каталог | Содержимое |
+| --- | --- |
+| dictionary | Dictionary — двоичное дерево слов и переводов |
+| turing | Tape, Program, Rule, TuringMachine |
+| cli | Меню и точки входа |
+| tests | Юнит-тесты, сценарии запуска и настройки тестов |
+| examples | Словарь и программа машины |
+| CMakeLists.txt | Сборка, тестирование и установка |
+| Doxyfile.in | Настройки документации |
+
+## Готовые программы
+
+```sh
+cmake --install build-lab1 --config Release --prefix build-lab1/package
+```
+
+В архивах Releases программы запускаются из папки распаковки.
+Для Ninja и Linux каталог `Release` в пути запуска отсутствует. На Linux расширение `.exe` отсутствует.
+
+[Releases](https://github.com/sonorinne/PPOIS-labs/releases) · [Actions](https://github.com/sonorinne/PPOIS-labs/actions)
+
+Выпуск версий — по тегам `lab1-v*`.
