@@ -1,0 +1,7 @@
+PROJECT_NAME      = "PPOIS Lab 1"
+INPUT             = "@DOCS_SOURCE@/dictionary" "@DOCS_SOURCE@/turing" "@DOCS_SOURCE@/cli"
+STRIP_FROM_PATH   = "@DOCS_SOURCE@"
+FILE_PATTERNS     = *.h *.cpp
+EXTRACT_ALL       = YES
+GENERATE_LATEX    = NO
+QUIET             = YES

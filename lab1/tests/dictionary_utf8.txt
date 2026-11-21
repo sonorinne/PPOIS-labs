@@ -1,0 +1,6 @@
+load examples/dictionary.txt
+find apple
+add sky небо
+replace sky "голубое небо"
+find sky
+exit
