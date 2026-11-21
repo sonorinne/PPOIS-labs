@@ -1,47 +1,31 @@
 # Пиццерия
 
-Консольное приложение на C++17 для работы с заказами пиццерии. В модели есть склад ингредиентов, рецепты, меню, оплата, кухня, упаковка и доставка. Отдельные классы отвечают за зал, отзывы, закупки и учёт расходов.
+Заказы, меню, склад, кухня и доставка. C++17, CMake 3.24+, doctest. Цены в BYN, расчёты в целых копейках. Оплата принимается с точкой или запятой.
 
-Цены указаны в белорусских рублях: `29.99 BYN`. При оплате принимаются точка и запятая, например `pay 35.00` или `pay 35,00`. Внутри расчётов суммы хранятся целыми копейками. Класс `Money` преобразует ввод и формирует денежные значения для меню и чеков. Масса задаётся в граммах, время — в минутах.
+Команды выполняются из корня репозитория. При первой настройке скачивается doctest.
 
-## Структура
-
-| Каталог | Назначение |
-| --- | --- |
-| include/stock, src/stock | Ингредиенты, поставщики, закупки и склад |
-| include/menu, src/menu | Рецепты, размеры, тесто, соусы, начинки и меню |
-| include/sales, src/sales | Покупатели, адреса, заказы, купоны, бонусы и платежи |
-| include/kitchen, src/kitchen | Печь, задания выпечки, повар и упаковка |
-| include/service, src/service | Курьеры, доставка, самовывоз, зал, отзывы и пиццерия |
-| include/exceptions | 12 отдельных классов исключений |
-| cli | Console и точка входа main |
-| tests | Проверки предметных классов и сценария меню |
-| tools/CheckModel.cmake | Проверка количественных требований по исходникам |
-
-## Сборка и тестирование
-
-Требуются CMake 3.24 и компилятор C++17. Команды выполняются из корня репозитория. При первой настройке скачивается doctest 2.4.11.
+## Сборка
 
 ```sh
 cmake -S lab2 -B build-lab2
 cmake --build build-lab2 --config Release
-ctest --test-dir build-lab2 -C Release --output-on-failure
-cmake --install build-lab2 --config Release --prefix build-lab2/package
 ```
 
-Для существующей локальной копии doctest допускается добавить параметр `-DFETCHCONTENT_SOURCE_DIR_DOCTEST=путь`. Интерфейс IDE для сборки и запуска тестов не требуется.
+## Тесты
+
+```sh
+ctest --test-dir build-lab2 -C Release --output-on-failure
+```
 
 ## Запуск
 
-Из корня репозитория на Windows:
-
 ```sh
-./build-lab2/package/pizzeria.exe
+./build-lab2/Release/pizzeria.exe
 ```
 
-На Linux используется имя `pizzeria`. В скачанном архиве программа запускается из папки распаковки. Кодировка ввода и вывода Windows устанавливается в UTF-8.
+Для Ninja и Linux используется путь `build-lab2/pizzeria` без каталога Release. На Windows расширение `.exe`.
 
-Пример команд меню:
+## Меню
 
 ```text
 menu
@@ -50,6 +34,7 @@ stock
 add 1
 total
 pay 35.00
+receipt
 bake
 pack
 deliver
@@ -58,24 +43,37 @@ new
 exit
 ```
 
-Пицца Classic стоит 29.99 BYN. При оплате 35.00 BYN сдача составляет 5.01 BYN. Приготовление одной пиццы расходует 210 г ингредиента с учётом потерь. Повторное пополнение того же ингредиента увеличивает существующий остаток. Выпечка требует оплаты, упаковка — выпечки, доставка — упаковки. Команда new начинает новый заказ. Классы рецептов, бонусов, закупок и бронирований дополнительно проверяются в юнит-тестах.
+Classic — 29.99 BYN. Сдача с 35.00 — 5.01 BYN. `bake` требует оплаты, `pack` — выпечки, `deliver` — упаковки. `consume GRAMS` списывает ингредиент, `new` начинает новый заказ.
 
-| Команда | Действие |
-| --- | --- |
-| menu | Просмотр меню |
-| add COUNT | Добавление пицц в заказ |
-| total | Расчёт суммы |
-| pay CASH | Оплата и расчёт сдачи |
-| receipt | Печать чека оплаченного заказа |
-| bake | Списание ингредиента и выпечка |
-| pack | Расход коробок и салфеток |
-| deliver | Назначение курьера и завершение доставки |
-| stock | Остатки ингредиентов |
-| restock GRAMS | Приём ингредиента на склад |
-| consume GRAMS | Списание ингредиента |
-| review STARS TEXT | Публикация отзыва с оценкой от 1 до 5 |
-| new | Новый заказ |
-| exit | Завершение программы |
+## Документация
+
+Требуется Doxygen, доступный при настройке CMake.
+
+```sh
+cmake --build build-lab2 --target docs
+explorer.exe build-lab2/html/index.html
+```
+
+## Покрытие (Linux)
+
+GCC и gcovr.
+
+```sh
+cmake -S lab2 -B build-lab2-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-lab2-coverage
+ctest --test-dir build-lab2-coverage --output-on-failure
+gcovr --root . --filter 'lab2/(src|include|cli)/' --txt --fail-under-line 90.01 build-lab2-coverage
+```
+
+## Релизы
+
+```sh
+cmake --install build-lab2 --config Release --prefix build-lab2/package
+```
+
+[Releases](https://github.com/sonorinne/PPOIS-labs/releases) · [Actions](https://github.com/sonorinne/PPOIS-labs/actions)
+
+Версии публикуются по тегам `lab2-v*`.
 
 ## Классы, поля, методы и связи
 
@@ -154,35 +152,3 @@ exit
 | [UnavailableOven](include/exceptions/UnavailableOven.h) | Печь не готова или занята |
 | [UnavailableCourier](include/exceptions/UnavailableCourier.h) | Курьер занят или не назначен |
 | [InvalidReservation](include/exceptions/InvalidReservation.h) | Недопустимое бронирование |
-
-## Проверки, документация и выпуск версии
-
-В тестах проверяются успешные операции, запреты по состоянию, недопустимые суммы и количества, недостаток запасов, недоступная печь и курьер, повторный платёж, возврат, скидки, бонусы и бронирование. Отдельный сценарий запускает приложение и проходит заказ от оплаты до доставки.
-
-Для локального покрытия с GCC и gcovr:
-
-```sh
-cmake -S lab2 -B build-lab2-coverage -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-lab2-coverage
-ctest --test-dir build-lab2-coverage --output-on-failure
-gcovr --root . --filter 'lab2/(src|include|cli)/' --txt --fail-under-line 90.01 build-lab2-coverage
-```
-
-При доступном Doxygen:
-
-```sh
-cmake -S lab2 -B build-lab2
-cmake --build build-lab2 --target docs
-explorer.exe build-lab2/html/index.html
-```
-
-Пайплайн находится в [.github/workflows/lab2.yml](../.github/workflows/lab2.yml). Задание verify запускает тесты и проверку модели, требует покрытие выше 90%, выполняет cppcheck и создаёт Doxygen. Задание package собирает и проверяет готовые программы для Windows и Linux. Тег lab2-v* запускает публикацию архивов в Releases. Артефакт lab2-reports содержит XML покрытия и HTML-документацию.
-
-Пример выпуска версии из ветки лабораторной после коммита и отправки изменений:
-
-```sh
-git switch lab2/pizzeria
-git push origin lab2/pizzeria
-git tag -a lab2-v1.0.3 -m "Pizzeria version 1.0.3"
-git push origin lab2-v1.0.3
-```
