@@ -78,7 +78,7 @@ load загружает пример, rules показывает правила,
 
 ```sh
 cmake --build lab1/build --target docs
-explorer.exe lab1/build/html/index.html
+powershell.exe -NoProfile -Command "Invoke-Item './lab1/build/html/index.html'"
 ```
 
 ## Покрытие (Linux)

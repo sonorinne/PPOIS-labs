@@ -51,7 +51,7 @@ Classic — 29.99 BYN. Сдача с 35.00 — 5.01 BYN. `bake` требует �
 
 ```sh
 cmake --build lab2/build --target docs
-explorer.exe lab2/build/html/index.html
+powershell.exe -NoProfile -Command "Invoke-Item './lab2/build/html/index.html'"
 ```
 
 ## Покрытие (Linux)
